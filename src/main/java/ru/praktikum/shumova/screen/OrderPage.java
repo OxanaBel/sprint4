@@ -1,29 +1,22 @@
 package ru.praktikum.shumova.screen;
 
 import lombok.Getter;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
 
 @Getter
-public class OrderForm {
+public class OrderPage {
     private final WebDriver driver;
-    //Кнопки
-    private By orderTopOfPage = By.className("Button_Button__ra12g"); //кнопка "Заказать" вверху страницы
-    private By orderBottomOfPage = By.cssSelector(".Button_Button__ra12g.Button_Middle__1CSJM"); //кнопка "Заказать" внизу страницы
-    private By ContinueButton = By.className("Button_Middle__1CSJM"); //кнопка "Далее"
-
     //Первый этап заказа
     private By fieldName = By.xpath("//input[@placeholder='* Имя']");
     private By lastNameField = By.xpath("//input[@placeholder='* Фамилия']");
     private By addressField = By.xpath("//input[@placeholder='* Адрес: куда привезти заказ']");
     private By metroField = By.xpath("//input[@placeholder='* Станция метро']");
     private By phoneNumberField = By.xpath("//input[@placeholder='* Телефон: на него позвонит курьер']");
-
+    private By continueButton = By.className("Button_Middle__1CSJM");
     //Второй этап заказа
     private By deliveryDate = By.xpath(".//input[@placeholder='* Когда привезти самокат']");
     private By nextMonthButton = By.className("react-datepicker__navigation--next");
@@ -35,22 +28,17 @@ public class OrderForm {
     private By greyScooterColor = By.id("grey");
     private By commentInput = By.xpath("//input[@placeholder='Комментарий для курьера']");
     private By orderButton = By.xpath("//div[@class='Order_Buttons__1xGrp']/button[text()='Заказать']");
-
     //Последний этап
     private By confirmationPopup = By.className("Order_Modal__YZ-d3");
     private By confirmOrderButton = By.xpath("//div[@class='Order_Modal__YZ-d3']/div/button[text()='Да']");
     private By successOrderPopup = By.className("Track_OrderInfo__2fpDL");
+    private By orderStatus = By.className("Order_ModalHeader__3FDaJ");
     private By orderStatusButton = By.xpath("//div[@class='Order_Modal__YZ-d3']/div/button[text()='Посмотреть статус']");
     private By orderStatusHeader = By.className("Order_ModalHeader__3FDaJ");
+    private By orderCard = By.className("Track_Row__1sN1F");
 
-
-    public OrderForm(WebDriver driver) {
+    public OrderPage(WebDriver driver) {
         this.driver = driver;
-    }
-
-    public void waitForLoadHeader() {
-        new WebDriverWait(driver, Duration.ofMillis(3000L))
-                .until(ExpectedConditions.visibilityOfElementLocated(orderBottomOfPage));
     }
 
     //Методы первого этапа заказа
@@ -76,7 +64,7 @@ public class OrderForm {
     }
 
     public void clickContinueButton() {
-        driver.findElement(ContinueButton).click();
+        driver.findElement(continueButton).click();
     }
 
     public void allInformation(String firstName, String lastName, String address, String phoneNumber) {
@@ -114,6 +102,10 @@ public class OrderForm {
     public void checkOrder() {
         driver.findElement(orderStatusButton).click();
         new WebDriverWait(driver, Duration.ofMillis(3000L))
-                .until(ExpectedConditions.visibilityOfElementLocated(successOrderPopup));
+                .until(ExpectedConditions.visibilityOfElementLocated(orderCard));
+    }
+
+    public WebElement getElement(By by) {
+        return driver.findElement(by);
     }
 }

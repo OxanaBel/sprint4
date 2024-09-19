@@ -3,26 +3,12 @@ package ru.praktikum.shumova;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.firefox.FirefoxOptions;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
-import ru.praktikum.shumova.screen.HomePage;
-
-import java.time.Duration;
+import ru.praktikum.shumova.screen.MainPage;
 
 import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
-public class CheckAnswersTest {
-    private static WebDriver driver;
-    private static HomePage homePage;
+public class CheckAnswersTest extends BaseTest {
 
     private String number;
     private String question;
@@ -34,25 +20,15 @@ public class CheckAnswersTest {
         this.answer = answer;
     }
 
-    @BeforeClass
-    public static void setUp() {
-        initChrome();
-        driver.get("https://qa-scooter.praktikum-services.ru/");
-        homePage = new HomePage(driver);
-        homePage.waitForLoadHeader();
-    }
-
     @Test
     public void checkAnswers() {
-        WebElement element = driver.findElement(By.id("accordion__heading-" + number));
-        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView();", element);
-        driver.findElement(By.id("accordion__heading-" + number)).click();
-        new WebDriverWait(driver, Duration.ofMillis(3000L))
-                .until(ExpectedConditions.visibilityOfElementLocated(By.id("accordion__panel-" + number)));
-        String actualAnswer = driver.findElement(By.id("accordion__panel-" + number)).getText();
-        String actualQuestion = driver.findElement(By.id("accordion__heading-" + number)).getText();
-        assertEquals(answer, actualAnswer);
+        MainPage mainPage = getMainPage();
+        mainPage.scrollIntoQuestions();
+        mainPage.clickQuestion(number);
+        String actualQuestion = mainPage.getQuestion(number);
+        String actualAnswer = mainPage.getAnswer(number);
         assertEquals(question, actualQuestion);
+        assertEquals(answer, actualAnswer);
     }
 
     @Parameterized.Parameters
@@ -67,20 +43,5 @@ public class CheckAnswersTest {
                 {"6", "Можно ли отменить заказ?", "Да, пока самокат не привезли. Штрафа не будет, объяснительной записки тоже не попросим. Все же свои."},
                 {"7", "Я жизу за МКАДом, привезёте?", "Да, обязательно. Всем самокатов! И Москве, и Московской области."},
         };
-    }
-
-    @AfterClass
-    public static void tearDown() {
-        driver.quit();
-    }
-
-    public static void initChrome() {
-        ChromeOptions options = new ChromeOptions();
-        driver = new ChromeDriver(options);
-    }
-
-    public static void initFirefox() {
-        FirefoxOptions options = new FirefoxOptions();
-        driver = new FirefoxDriver(options);
     }
 }
